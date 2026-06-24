@@ -5,7 +5,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 from urllib.parse import urlsplit 
 from datetime import datetime, timezone
-
+import requests
 
 @app.route('/index', methods = ["POST", "GET"])
 @login_required
@@ -59,13 +59,30 @@ def register():
         return redirect(url_for('index'))
     form = RegisterForm()
     if form.validate_on_submit():
+        token = request.form.get("cf-turnstile-response")
+        response = requests.post(
+                "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+
+                data={
+                    "secret":
+                    app.config["TURNSTILE_SECRET_KEY"],
+
+                    "response":
+                    token
+                }
+                )
+        result = response.json()
+        
+        if not result["success"]:
+            flash("Turnstile verification failed")
+            return redirect(url_for(register))
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Register', form=form, site_key = app.config["TURNSTILE_SITE_KEY"])
 
 
 @app.route("/user/<username>")

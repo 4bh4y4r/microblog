@@ -32,6 +32,20 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+
+
+        <div class="cf-turnstile"
+        data-sitekey="{{site_key}}">
+
+
+        </div>
         <p>{{ form.submit() }}</p>
     </form>
+
+    <script
+src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+async defer>
+</script>
 {% endblock %}
+
+
