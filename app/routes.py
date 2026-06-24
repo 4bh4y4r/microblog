@@ -74,7 +74,11 @@ def profile(username):
     user = User.query.filter_by(username = username).first()
     if not user:
         return 404
-    return render_template('profile.html', user = user)
+    page = request.args.get('page',1,type=int)
+    posts = Post.query.filter_by(user_id =user.id).order_by(Post.timestamp.desc()).paginate(page=page,per_page =5, error_out = False)
+    next_url = url_for('profile',username = user.username,  page = posts.next_num) if posts.has_next else None
+    prev_url = url_for('profile', username = user.username, page = posts.prev_num) if posts.has_prev else None
+    return render_template('profile.html', user = user, posts = posts, next_url = next_url, prev_url = prev_url)
 
 
 @app.before_request
