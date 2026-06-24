@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User, Post
 
@@ -49,3 +49,9 @@ class EditProfileForm(FlaskForm):
 
             if user:
                 raise ValidationError("Please use a different username")
+            
+
+class PostForm(FlaskForm):
+
+    content = TextAreaField("What's on your mind?", validators=[Length(min=2, max = 500)])
+    submit  = SubmitField("Post")

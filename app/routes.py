@@ -1,17 +1,25 @@
 from app import app, db
 from flask import render_template, request, redirect, url_for,flash
-from app.forms import LoginForm, RegisterForm, EditProfileForm
+from app.forms import LoginForm, RegisterForm, EditProfileForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 from urllib.parse import urlsplit 
 from datetime import datetime, timezone
 
 
-@app.route('/index')
+@app.route('/index', methods = ["POST", "GET"])
 @login_required
 def index():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body = form.content.data, author = current_user)
+        db.session.add(post)
+        db.session.commit()
 
-    return render_template('index.html')
+        return redirect(url_for('index'))
+    
+    postss = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.html', form = form, posts = postss)
 
 
 @app.route('/login', methods = ["GET", "POST"])

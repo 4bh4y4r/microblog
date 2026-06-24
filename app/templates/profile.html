@@ -9,7 +9,21 @@
     <p> {{user.about_me}}</p>
     {% endif %}
     <p> Last seem : {{current_user.last_seen}}</p>
+    <hr>
 
+
+    <p> Latest Posts: </p> <br>
+    {% for post in user.posts %}
+
+        <div>
+            <p> {{user.username}}</p>
+            <p> {{post}} </p>
+            <hr>
+
+
+        </div>
+
+    {% endfor %}
    
 
 {% endblock %}
