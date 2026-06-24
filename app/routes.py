@@ -146,3 +146,17 @@ def unfollow(username):
     flash("You have unfollowed {username}")
 
     return redirect(url_for('profile', username = username))
+
+
+@app.route("/search")
+@login_required
+def search():
+
+    query = request.args.get('q')
+
+    users = User.query.filter(User.username.ilike(f"%{query}%")).all()
+
+
+    return render_template(
+        'search.html',query = query, users = users
+    )
