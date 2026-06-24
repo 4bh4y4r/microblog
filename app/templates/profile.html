@@ -9,6 +9,21 @@
     <p> {{user.about_me}}</p>
     {% endif %}
     <p> Last seem : {{current_user.last_seen}}</p>
+    {% if user!= current_user %}
+        {% if current_user.is_following(user) %}
+
+            <a href="{{url_for('unfollow', username = user.username)}}">  Unfollow </a>
+
+        {% else %}
+
+            <a href="{{url_for('follow', username = user.username)}}">  Follow </a>
+
+        {% endif %}
+
+    {% endif %}
+
+    <p> Followers: {{user.followers|length}}</p>
+    <p> Following: {{user.following|length}}</p>
     <hr>
 
 

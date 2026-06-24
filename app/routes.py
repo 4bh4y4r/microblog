@@ -1,5 +1,5 @@
 from app import app, db
-from flask import render_template, request, redirect, url_for,flash
+from flask import render_template, request, redirect, url_for,flash, abort
 from app.forms import LoginForm, RegisterForm, EditProfileForm, PostForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
@@ -98,3 +98,42 @@ def edit_profile():
         form.about_me.data = current_user.about_me
 
     return render_template('editprofile.html',form = form)
+
+
+@app.route("/follow/<username>", methods= ["GET", "POST"])
+@login_required
+def follow(username):
+    user = User.query.filter_by(username = username).first()
+
+    if not user:
+        abort(404)
+
+    if user == current_user:
+        flash("You cannot follow yourself! ")
+        return redirect(url_for('profile',username=username))
+    
+    current_user.follow(user)
+    db.session.commit()
+    flash("You are now following {username}")
+
+    return redirect(url_for('profile',username = username))
+
+
+
+@app.route("/unfollow/<username>", methods = ["GET", "POST"])
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username = username).first()
+
+    if not user:
+        abort(404)
+
+    if user == current_user:
+        flash("You cannot unfollow yourself! ")
+        return redirect(url_for('profile',username=username)) 
+    
+    current_user.unfollow(user)
+    db.session.commit()
+    flash("You have unfollowed {username}")
+
+    return redirect(url_for('profile', username = username))

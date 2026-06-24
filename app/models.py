@@ -10,6 +10,30 @@ def load_user(id):
     return db.session.get(User, int(id))
 
 
+followers = db.Table(
+    "followers",
+
+    db.Column("follower_id",
+              db.Integer,
+              db.ForeignKey("user.id"),
+              primary_key = True
+              
+              
+              ),
+    db.Column("followed_id",
+              db.Integer,
+              db.ForeignKey("user.id"),
+              primary_key = True
+              
+              
+              )
+    
+
+
+
+)
+
+
 
 class User(UserMixin,db.Model):
 
@@ -18,6 +42,41 @@ class User(UserMixin,db.Model):
     password_hash = db.Column(db.String(200), nullable = False)
     email = db.Column(db.String(50), nullable = False, unique = True)
     about_me = db.Column(db.String(300))
+
+    following = db.relationship(
+        "User",
+        secondary = followers,
+        primaryjoin = (followers.c.follower_id == id
+                       ),
+        secondaryjoin = (followers.c.followed_id == id
+                         ),
+        back_populates = "followers"
+
+
+
+
+
+    )
+
+    followers = db.relationship(
+    "User",
+
+    secondary=followers,
+
+    primaryjoin=(
+        followers.c.followed_id == id
+    ),
+
+    secondaryjoin=(
+        followers.c.follower_id == id
+    ),
+
+    back_populates="following"
+    )
+
+
+
+
 
     last_seen = db.Column(db.DateTime, default = lambda:datetime.now(timezone.utc))
 
@@ -41,6 +100,20 @@ class User(UserMixin,db.Model):
             f"https://www.gravatar.com/avatar/"
             f"{digest}?d=identicon&s={size}"
         )
+    
+    def follow(self,user):
+        if not self.is_following(user):
+            self.following.append(user)
+
+    def unfollow(self,user):
+
+        if self.is_following(user):
+            self.following.remove(user)
+
+    def is_following(self,user):
+
+        return user in self.following 
+    
 
     
 
