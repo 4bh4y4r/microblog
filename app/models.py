@@ -17,6 +17,9 @@ class User(UserMixin,db.Model):
     username = db.Column(db.String(50), nullable = False, unique = True)
     password_hash = db.Column(db.String(200), nullable = False)
     email = db.Column(db.String(50), nullable = False, unique = True)
+    about_me = db.Column(db.String(300))
+
+    last_seen = db.Column(db.DateTime, default = lambda:datetime.now(timezone.utc))
 
     posts = db.relationship("Post", backref = "author")
 
@@ -33,7 +36,7 @@ class User(UserMixin,db.Model):
         digest = md5(
             self.email.lower().encode("utf-8")
         ).hexdigest()
-    
+
         return (
             f"https://www.gravatar.com/avatar/"
             f"{digest}?d=identicon&s={size}"

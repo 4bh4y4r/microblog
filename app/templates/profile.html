@@ -5,4 +5,11 @@
     <h1> User: {{user.username}}</h1>
     <p> Email: {{user.email}}</p>
 
+     {% if user.about_me %}
+    <p> {{user.about_me}}</p>
+    {% endif %}
+    <p> Last seem : {{current_user.last_seen}}</p>
+
+   
+
 {% endblock %}

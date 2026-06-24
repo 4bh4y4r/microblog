@@ -4,6 +4,7 @@ from app.forms import LoginForm, RegisterForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 from urllib.parse import urlsplit 
+from datetime import datetime, timezone
 
 
 @app.route('/index')
@@ -61,3 +62,11 @@ def profile(username):
     if not user:
         return 404
     return render_template('profile.html', user = user)
+
+
+@app.before_request
+def before_request():
+
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.now(timezone.utc)
+        db.session.commit()
