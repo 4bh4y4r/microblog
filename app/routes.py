@@ -18,7 +18,7 @@ def index():
 
         return redirect(url_for('index'))
     
-    postss = Post.query.order_by(Post.timestamp.desc()).all()
+    postss = current_user.followed_posts().all()
     return render_template('index.html', form = form, posts = postss)
 
 
