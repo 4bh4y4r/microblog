@@ -16,7 +16,7 @@ def index():
 @app.route('/login', methods = ["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index.html'))
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username = form.username.data).first()
@@ -35,7 +35,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    logout_user
+    logout_user()
     return redirect(url_for('login'))
 
 
@@ -52,3 +52,12 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route("/user/<username>")
+@login_required
+def profile(username):
+    user = User.query.filter_by(username = username).first()
+    if not user:
+        return 404
+    return render_template('profile.html', user = user)
