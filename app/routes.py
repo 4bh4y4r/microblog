@@ -18,8 +18,13 @@ def index():
 
         return redirect(url_for('index'))
     
-    postss = current_user.followed_posts().all()
-    return render_template('index.html', form = form, posts = postss)
+    page = request.args.get('page',1,type = int)
+    postss = current_user.followed_posts().paginate(
+        page = page,per_page = 5,error_out = False
+    )
+    next_url = url_for('index', page = postss.next_num) if postss.has_next else None 
+    prev_url = url_for('index', page = postss.prev_num) if postss.has_prev else None 
+    return render_template('index.html', form = form, posts = postss, next_url = next_url, prev_url = prev_url)
 
 
 @app.route('/login', methods = ["GET", "POST"])

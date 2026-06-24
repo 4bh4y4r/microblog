@@ -8,7 +8,7 @@
         <p> {{form.content.label}} {{form.content(rows=4,cols = 50)}} <br> </p>
         <p> {{form.submit()}} <br> </p>
         
-       {% for post in posts %}
+       {% for post in posts.items %}
 
             <div>
             
@@ -25,6 +25,10 @@
             <hr>
 
         {% endfor %}
+        
+        <a href="{{next_url}}">Newer Posts</a>
+        <a href="{{prev_url}}">Older Posts</a>
+   
 
 
     </form>
