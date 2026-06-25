@@ -2,7 +2,7 @@ from app import app, db
 from flask import render_template, request, redirect, url_for,flash, abort
 from app.forms import LoginForm, RegisterForm, EditProfileForm, PostForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Post, Comment
+from app.models import User, Post, Comment, Notification
 from urllib.parse import urlsplit 
 from datetime import datetime, timezone
 import requests
@@ -200,6 +200,12 @@ def post(id):
 def like(id):
     post = Post.query.get_or_404(id)
     current_user.like_post(post)
+    notification = Notification(
+    user=post.author,
+    text=f"{current_user.username} liked your post"
+    )
+
+    db.session.add(notification)
     db.session.commit()
     return redirect(url_for('index'))
 
@@ -212,3 +218,17 @@ def unlike(id):
     current_user.unlike_post(post)
     db.session.commit()
     return redirect(url_for('index'))
+
+
+
+@app.route("/notifications")
+@login_required
+def notifications():
+    for notification in current_user.notifications:
+        notification.is_read = True
+
+    db.session.commit()
+    return render_template(
+        "notifications.html",
+        notifications=current_user.notifications
+    )

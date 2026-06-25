@@ -88,6 +88,11 @@ class User(UserMixin,db.Model):
 
     liked_posts = db.relationship("Post", secondary = "likes", back_populates = "liked_by")
 
+    notifications = db.relationship(
+    "Notification",
+    backref="user"
+                    )
+
 
 
 
@@ -156,6 +161,12 @@ class User(UserMixin,db.Model):
 
         return post in self.liked_posts
     
+    def unread_notifications(self):
+        return len(
+            [n for n in self.notifications
+             if not n.is_read]
+        )
+    
 
     
 
@@ -182,6 +193,32 @@ class Comment(db.Model):
     timestamp = db.Column(db.DateTime, default =lambda: datetime.now(timezone.utc) )
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+class Notification(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id")
+    )
+
+    text = db.Column(
+        db.String(200)
+    )
+
+    timestamp = db.Column(
+        db.DateTime
+    )
+
+    is_read = db.Column(
+        db.Boolean,
+        default=False
+    )
     
     
 

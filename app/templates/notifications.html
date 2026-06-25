@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Notifications</h1>
+
+{% for notification in notifications %}
+
+    <p>{{ notification.text }}</p>
+    <hr>
+
+{% endfor %}
+
+{% endblock %}
