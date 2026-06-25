@@ -32,7 +32,7 @@
 
         <div>
              <a href="{{url_for('profile', username = user.username)}}">{{ user.username }}</a>
-            <p> {{post.body}} </p>
+            <p> <a href="{{url_for('post', id = post.id)}}">{{post.body}}</a> </p>
             <hr>
 
 

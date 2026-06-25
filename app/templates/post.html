@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div> 
+        <p> {{post.author.username}}</p> <br>
+
+        <p>  {{post.body}} </p>
+        <p>  {{post.timestamp}} </p>
+          <p> Likes: {{post.liked_by|length}}</p>
+                    {% if current_user.has_liked(post) %}
+                        <a href="{{url_for('unlike', id=post.id)}}"> Unlike </a>
+                    {% else %}
+                        <a href="{{url_for('like', id = post.id)}}"> Like </a>
+                    {% endif %}
+        <hr>
+
+
+    </div>
+
+    <div>
+
+        <form  method="POST">
+
+            {{form.hidden_tag()}}
+            <p> {{form.body.label}} {{form.body(size=60)}}</p>
+            <p> {{form.submit()}}</p>
+            <hr>
+        </form>
+
+
+
+    </div>
+
+    {% for comment in post.comments %}
+        <div>
+            <p> {{comment.author.username}}</p>
+            <p> {{comment.body}}</p>
+            <p> {{comment.timestamp}}</p>
+            <hr>
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

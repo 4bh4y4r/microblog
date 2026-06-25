@@ -17,7 +17,13 @@
                 </p>
             
                 <p>
-                    {{ post.body }}
+                    <a href="{{url_for('post', id = post.id)}}">{{post.body}}</a>
+                    <p> Likes: {{post.liked_by|length}}</p>
+                    {% if current_user.has_liked(post) %}
+                        <a href="{{url_for('unlike', id=post.id)}}"> Unlike </a>
+                    {% else %}
+                        <a href="{{url_for('like', id = post.id)}}"> Like </a>
+                    {% endif %}
                 </p>
             
             </div>

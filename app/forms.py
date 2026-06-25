@@ -55,3 +55,11 @@ class PostForm(FlaskForm):
 
     content = TextAreaField("What's on your mind?", validators=[Length(min=2, max = 500)])
     submit  = SubmitField("Post")
+
+class CommentForm(FlaskForm):
+
+    body = TextAreaField("Type a comment.", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+

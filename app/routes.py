@@ -1,8 +1,8 @@
 from app import app, db
 from flask import render_template, request, redirect, url_for,flash, abort
-from app.forms import LoginForm, RegisterForm, EditProfileForm, PostForm
+from app.forms import LoginForm, RegisterForm, EditProfileForm, PostForm, CommentForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Post
+from app.models import User, Post, Comment
 from urllib.parse import urlsplit 
 from datetime import datetime, timezone
 import requests
@@ -140,7 +140,7 @@ def follow(username):
     
     current_user.follow(user)
     db.session.commit()
-    flash("You are now following {username}")
+    flash(f"You are now following {username}")
 
     return redirect(url_for('profile',username = username))
 
@@ -177,3 +177,38 @@ def search():
     return render_template(
         'search.html',query = query, users = users
     )
+
+
+@app.route("/post/<id>", methods = ["GET", "POST"])
+@login_required
+def post(id):
+    post = Post.query.get_or_404(id)
+    
+
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(body = form.body.data, author = current_user, post = post)
+        db.session.add(comment)
+        db.session.commit()
+        return redirect(url_for('post',id=post.id))
+    
+
+    return render_template("post.html",post = post, form = form)
+
+@app.route('/like/<id>', methods =["GET", "POST"])
+@login_required
+def like(id):
+    post = Post.query.get_or_404(id)
+    current_user.like_post(post)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/unlike/<id>', methods = ["GET", "POST"])
+@login_required
+def unlike(id):
+
+    post = Post.query.get_or_404(id)
+    current_user.unlike_post(post)
+    db.session.commit()
+    return redirect(url_for('index'))

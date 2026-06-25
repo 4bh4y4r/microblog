@@ -33,6 +33,18 @@ followers = db.Table(
 
 )
 
+likes = db.Table(
+        "likes",
+
+        db.Column("user_id", db.Integer, db.ForeignKey('user.id'), primary_key = True),
+        db.Column("post_id", db.Integer, db.ForeignKey('post.id'), primary_key = True)
+
+
+
+
+
+)
+
 
 
 class User(UserMixin,db.Model):
@@ -74,6 +86,8 @@ class User(UserMixin,db.Model):
     back_populates="following"
     )
 
+    liked_posts = db.relationship("Post", secondary = "likes", back_populates = "liked_by")
+
 
 
 
@@ -81,6 +95,8 @@ class User(UserMixin,db.Model):
     last_seen = db.Column(db.DateTime, default = lambda:datetime.now(timezone.utc))
 
     posts = db.relationship("Post", backref = "author")
+
+    comments = db.relationship("Comment", backref="author")
 
     def __repr__(self):
         return f"User {self.username}"
@@ -126,6 +142,21 @@ class User(UserMixin,db.Model):
         return followed.union(own).order_by(Post.timestamp.desc())
     
 
+    def like_post(self,post):
+
+        if not self.has_liked(post):
+            self.liked_posts.append(post)
+    
+    def unlike_post(self,post):
+
+        if self.has_liked(post):
+            self.liked_posts.remove(post)
+
+    def has_liked(self,post):
+
+        return post in self.liked_posts
+    
+
     
 
 
@@ -137,8 +168,21 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default = lambda : datetime.now(timezone.utc))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
 
+    comments = db.relationship("Comment", backref="post")
+    liked_by = db.relationship("User", secondary = "likes", back_populates = "liked_posts")
+
     def __repr__(self):
         return f"Post {self.body[:20]}"
+    
+
+class Comment(db.Model):
+
+    id = db.Column(db.Integer, primary_key = True)
+    body = db.Column(db.String, nullable = False)
+    timestamp = db.Column(db.DateTime, default =lambda: datetime.now(timezone.utc) )
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    
     
 
 
